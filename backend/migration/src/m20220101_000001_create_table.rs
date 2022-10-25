@@ -1,0 +1,287 @@
+use entity::{blog, blogs_tags, comment, file, sort, tag, user};
+use sea_orm_migration::prelude::*;
+pub struct Migration;
+
+impl MigrationName for Migration {
+    fn name(&self) -> &str {
+        "m20220101_000001_create_table"
+    }
+}
+
+#[async_trait::async_trait]
+impl MigrationTrait for Migration {
+    async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
+        manager
+            .create_table(
+                Table::create()
+                    .table(sort::Entity)
+                    .if_not_exists()
+                    .col(
+                        ColumnDef::new(sort::Column::Id)
+                            .integer()
+                            .not_null()
+                            .auto_increment()
+                            .primary_key(),
+                    )
+                    .col(
+                        ColumnDef::new(sort::Column::Name)
+                            .string()
+                            .unique_key()
+                            .not_null(),
+                    )
+                    .to_owned(),
+            )
+            .await?;
+        manager
+            .create_table(
+                Table::create()
+                    .table(user::Entity)
+                    .if_not_exists()
+                    .col(
+                        ColumnDef::new(user::Column::Id)
+                            .integer()
+                            .not_null()
+                            .auto_increment()
+                            .primary_key(),
+                    )
+                    .col(ColumnDef::new(user::Column::Nickname).string())
+                    .col(
+                        ColumnDef::new(user::Column::Username)
+                            .string()
+                            .unique_key()
+                            .not_null(),
+                    )
+                    .col(ColumnDef::new(user::Column::Password).string().not_null())
+                    .col(ColumnDef::new(user::Column::Email).string())
+                    .col(ColumnDef::new(user::Column::Avatar).string())
+                    .col(
+                        ColumnDef::new(user::Column::AccessLevel)
+                            .integer()
+                            .not_null(),
+                    )
+                    .col(ColumnDef::new(user::Column::CreateTime).timestamp())
+                    .to_owned(),
+            )
+            .await?;
+        manager
+            .create_table(
+                Table::create()
+                    .table(blog::Entity)
+                    .if_not_exists()
+                    .col(
+                        ColumnDef::new(blog::Column::Id)
+                            .integer()
+                            .not_null()
+                            .auto_increment()
+                            .primary_key(),
+                    )
+                    .col(ColumnDef::new(blog::Column::Title).string().not_null())
+                    .col(ColumnDef::new(blog::Column::Summary).string())
+                    .col(ColumnDef::new(blog::Column::Content).string().not_null())
+                    .col(ColumnDef::new(blog::Column::Cover).string())
+                    .col(ColumnDef::new(blog::Column::Flag).string().not_null())
+                    .col(
+                        ColumnDef::new(blog::Column::Views)
+                            .integer()
+                            .not_null()
+                            .default(0),
+                    )
+                    .col(
+                        ColumnDef::new(blog::Column::Appreciation)
+                            .boolean()
+                            .not_null()
+                            .default(false),
+                    )
+                    .col(
+                        ColumnDef::new(blog::Column::ShareStatement)
+                            .boolean()
+                            .not_null()
+                            .default(false),
+                    )
+                    .col(
+                        ColumnDef::new(blog::Column::EnableComment)
+                            .boolean()
+                            .not_null()
+                            .default(true),
+                    )
+                    .col(
+                        ColumnDef::new(blog::Column::Published)
+                            .boolean()
+                            .not_null()
+                            .default(false),
+                    )
+                    .col(
+                        ColumnDef::new(blog::Column::Recommend)
+                            .boolean()
+                            .not_null()
+                            .default(false),
+                    )
+                    .col(ColumnDef::new(blog::Column::CreateTime).timestamp())
+                    .col(ColumnDef::new(blog::Column::UpdateTime).timestamp())
+                    .col(ColumnDef::new(blog::Column::SortId).integer().not_null())
+                    .col(ColumnDef::new(blog::Column::UserId).integer().not_null())
+                    .foreign_key(
+                        ForeignKey::create()
+                            .name("blog_to_sort_id")
+                            .from(blog::Entity, blog::Column::SortId)
+                            .to(sort::Entity, sort::Column::Id),
+                    )
+                    .foreign_key(
+                        ForeignKey::create()
+                            .name("blog_to_user_id")
+                            .from(blog::Entity, blog::Column::UserId)
+                            .to(user::Entity, user::Column::Id),
+                    )
+                    .to_owned(),
+            )
+            .await?;
+        manager
+            .create_table(
+                Table::create()
+                    .table(tag::Entity)
+                    .if_not_exists()
+                    .col(
+                        ColumnDef::new(tag::Column::Id)
+                            .integer()
+                            .not_null()
+                            .auto_increment()
+                            .primary_key(),
+                    )
+                    .col(
+                        ColumnDef::new(tag::Column::Name)
+                            .string()
+                            .unique_key()
+                            .not_null(),
+                    )
+                    .to_owned(),
+            )
+            .await?;
+        manager
+            .create_table(
+                Table::create()
+                    .table(blogs_tags::Entity)
+                    .if_not_exists()
+                    .col(
+                        ColumnDef::new(blogs_tags::Column::BlogId)
+                            .integer()
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(blogs_tags::Column::TagId)
+                            .integer()
+                            .not_null(),
+                    )
+                    .foreign_key(
+                        ForeignKey::create()
+                            .name("blogs_tags_to_blog_id")
+                            .from(blogs_tags::Entity, blogs_tags::Column::BlogId)
+                            .to(blog::Entity, blog::Column::Id)
+                            .on_delete(ForeignKeyAction::Cascade)
+                            .on_update(ForeignKeyAction::Cascade),
+                    )
+                    .foreign_key(
+                        ForeignKey::create()
+                            .name("blogs_tags_to_tag_id")
+                            .from(blogs_tags::Entity, blogs_tags::Column::TagId)
+                            .to(tag::Entity, tag::Column::Id)
+                            .on_delete(ForeignKeyAction::Cascade)
+                            .on_update(ForeignKeyAction::Cascade),
+                    )
+                    .to_owned(),
+            )
+            .await?;
+        manager
+            .create_table(
+                Table::create()
+                    .table(comment::Entity)
+                    .if_not_exists()
+                    .col(
+                        ColumnDef::new(comment::Column::Id)
+                            .integer()
+                            .not_null()
+                            .auto_increment()
+                            .primary_key(),
+                    )
+                    .col(ColumnDef::new(comment::Column::IdRef).integer())
+                    .col(
+                        ColumnDef::new(comment::Column::Nickname)
+                            .string()
+                            .not_null(),
+                    )
+                    .col(ColumnDef::new(comment::Column::Email).string().not_null())
+                    .col(ColumnDef::new(comment::Column::Content).string().not_null())
+                    .col(ColumnDef::new(comment::Column::Avatar).string())
+                    .col(ColumnDef::new(comment::Column::Like).integer())
+                    .col(ColumnDef::new(comment::Column::Dislike).integer())
+                    .col(ColumnDef::new(comment::Column::CreateTime).timestamp())
+                    .col(ColumnDef::new(comment::Column::BlogId).integer().not_null())
+                    .foreign_key(
+                        ForeignKey::create()
+                            .name("comment_to_blog_id")
+                            .from(comment::Entity, comment::Column::BlogId)
+                            .to(blog::Entity, blog::Column::Id)
+                            .on_delete(ForeignKeyAction::Cascade)
+                            .on_update(ForeignKeyAction::Cascade),
+                    )
+                    .foreign_key(
+                        ForeignKey::create()
+                            .name("comment_to_comment_id")
+                            .from(comment::Entity, comment::Column::IdRef)
+                            .to(comment::Entity, comment::Column::Id)
+                            .on_delete(ForeignKeyAction::Cascade)
+                            .on_update(ForeignKeyAction::Cascade),
+                    )
+                    .to_owned(),
+            )
+            .await?;
+        manager
+            .create_table(
+                Table::create()
+                    .table(file::Entity)
+                    .if_not_exists()
+                    .col(
+                        ColumnDef::new(file::Column::Id)
+                            .integer()
+                            .primary_key()
+                            .auto_increment()
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(file::Column::Path)
+                            .string()
+                            .unique_key()
+                            .not_null(),
+                    )
+                    .col(ColumnDef::new(file::Column::FileType).string())
+                    .col(ColumnDef::new(file::Column::FileName).string())
+                    .col(ColumnDef::new(file::Column::UserId).integer().not_null())
+                    .foreign_key(
+                        ForeignKey::create()
+                            .name("file_to_user_id")
+                            .from(file::Entity, file::Column::UserId)
+                            .to(user::Entity, user::Column::Id)
+                            .on_delete(ForeignKeyAction::Cascade)
+                            .on_update(ForeignKeyAction::Cascade),
+                    )
+                    .to_owned(),
+            )
+            .await?;
+        Ok(())
+    }
+
+    async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
+        manager
+            .drop_table(
+                sea_query::Table::drop()
+                    .table(blog::Entity)
+                    .table(tag::Entity)
+                    .table(blogs_tags::Entity)
+                    .table(sort::Entity)
+                    .table(comment::Entity)
+                    .table(user::Entity)
+                    .table(file::Entity)
+                    .to_owned(),
+            )
+            .await
+    }
+}

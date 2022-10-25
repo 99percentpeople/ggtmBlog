@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_USER: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - blog-data:/var/lib/postgres
+
+  blog:
+    build: .
+    ports:
+      - "8080:8080"
+    links:
+      - postgres
+    depends_on:
+      - postgres
+    
+
+volumes:
+  blog-data:

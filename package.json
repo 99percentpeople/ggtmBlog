@@ -1,0 +1,15 @@
+{
+    "name": "ggtmblog",
+    "private": true,
+    "workspaces": [
+        "frontend/common",
+        "frontend/blog",
+        "frontend/blog-admin"
+    ],
+    "scripts": {
+        "dev": "cargo run --bin blog-server && yarn workspaces run",
+        "watch": "cargo watch -- cargo run --bin blog-server && yarn workspaces run"
+    },
+    "version": "1.0.0",
+    "license": "MIT"
+}

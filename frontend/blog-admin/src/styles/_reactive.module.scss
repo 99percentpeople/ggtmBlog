@@ -1,0 +1,16 @@
+// 响应式变量
+$xs: 0;
+$s: 640px;
+$m: 1024px;
+$l: 1280px;
+$xl: 1536px;
+$xxl: 1920px;
+
+:export {
+    xs: $xs;
+    s: $s;
+    m: $m;
+    l: $l;
+    xl: $xl;
+    xxl: $xxl;
+}

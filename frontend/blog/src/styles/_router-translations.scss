@@ -1,0 +1,42 @@
+.slide {
+    &-left,
+    &-right {
+        &-enter,
+        &-leave {
+            &-active {
+                will-change: transform;
+                transition: all 0.3s ease-out;
+            }
+        }
+
+        &-enter-from,
+        &-leave-to {
+            opacity: 0;
+        }
+    }
+
+    &-right-enter-from {
+        transform: translate(-100%, 0);
+    }
+
+    &-left-enter-from {
+        transform: translate(100%, 0);
+    }
+}
+
+.fade {
+    &-enter-active {
+        will-change: opacity;
+        transition: opacity 0.2s ease;
+    }
+    &-leave-active {
+        will-change: opacity;
+    }
+
+    &-enter-from {
+        opacity: 0;
+    }
+    &-leave-to {
+        opacity: 0;
+    }
+}

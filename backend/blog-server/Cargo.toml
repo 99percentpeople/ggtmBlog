@@ -1,0 +1,39 @@
+[package]
+name = "blog-server"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+entity = { path = "../entity" }
+migration = { path = "../migration" }
+
+actix-web = "4.0"
+actix-identity = "0.4.0"
+serde_json = "1.0"
+chrono = "0.4"
+env_logger = "0.9"
+log = "0.4"
+dotenv = "0.15"
+derive_more = "0.99"
+futures = "0.3"
+async-stream = "0.3"
+futures-core = "0.3"
+serde = { version = "1.0", features = ["derive"] }
+sea-orm = { version = "^0.9.0", features = [
+    "sqlx-postgres",
+    "runtime-actix-rustls",
+    "macros",
+    "with-chrono",
+] }
+regex = "1.5"
+rust-crypto = "0.2"
+async-recursion = "1.0"
+actix-multipart = "0.4"
+actix-files = "0.6"
+uuid = { version = "1.0", features = ["serde", "v4"] }
+actix-extensible-rate-limit = "0.2.1"
+lazy_static = "1.4"
+thiserror = "*"
+anyhow = "*"
+actix-settings = "0.6.0"
+actix-web-lab = "0.17.0"
