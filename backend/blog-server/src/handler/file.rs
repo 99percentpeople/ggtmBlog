@@ -1,11 +1,10 @@
 use std::{
-    env,
     fs::File,
     io::{ErrorKind, Write},
 };
 
 use super::*;
-use crate::error::ServerResult;
+use crate::{error::ServerResult, Settings};
 use actix_files::NamedFile;
 use actix_identity::Identity;
 use actix_multipart::Multipart;
@@ -134,9 +133,10 @@ async fn upload_file(
     id: Identity,
     payload: Multipart,
     conn: web::Data<DatabaseConnection>,
+    settings: web::Data<Settings>,
 ) -> ServerResult<impl Responder> {
     let user_info = try_verify(&id, 3)?;
-    let base_path = env::var("FILE_BASE_PATH").unwrap_or(".".into());
+    let base_path = settings.application.file_path_url.to_owned();
     let user_dir = format!("{}-{}", user_info.id, user_info.username);
     let mut path: path::PathBuf = [&base_path, &user_dir].iter().collect();
 
@@ -176,8 +176,9 @@ async fn upload_file(
 pub async fn get_file(
     path: web::Path<i32>,
     conn: web::Data<DatabaseConnection>,
+    settings: web::Data<Settings>,
 ) -> ServerResult<impl Responder> {
-    let base_path = env::var("FILE_BASE_PATH").unwrap_or(".".into());
+    let base_path = settings.application.file_path_url.to_owned();
     let file_id = path.into_inner();
     let file = file::Entity::find_by_id(file_id)
         .one(&conn as &DatabaseConnection)
@@ -203,9 +204,10 @@ pub async fn delete_file(
     id: Identity,
     path: web::Path<i32>,
     conn: web::Data<DatabaseConnection>,
+    settings: web::Data<Settings>,
 ) -> ServerResult<impl Responder> {
     try_verify(&id, 3)?;
-    let base_path = env::var("FILE_BASE_PATH").unwrap_or(".".into());
+    let base_path = settings.application.file_path_url.to_owned();
     let file_id = path.into_inner();
     let old = file::Entity::find_by_id(file_id)
         .one(&conn as &DatabaseConnection)
@@ -271,6 +273,7 @@ async fn put_file(
     path: web::Path<i32>,
     payload: Multipart,
     conn: web::Data<DatabaseConnection>,
+    settings: web::Data<Settings>,
 ) -> ServerResult<impl Responder> {
     try_verify(&id, 3)?;
     let file_id = path.into_inner();
@@ -279,7 +282,7 @@ async fn put_file(
         .one(&conn as &DatabaseConnection)
         .await?
         .ok_or(ErrorNotFound("未找到该文件"))?;
-    let base_path = env::var("FILE_BASE_PATH").unwrap_or(".".into());
+    let base_path = settings.application.file_path_url.to_owned();
     let path: path::PathBuf = [&base_path, &file.path].iter().collect();
 
     update_file(payload, &path).await?;

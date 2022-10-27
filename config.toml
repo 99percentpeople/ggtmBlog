@@ -71,5 +71,5 @@ private-key = "path/to/cert/key.pem"
 # The `application` table be used to express application-specific settings.
 # See the `README.md` file for more details on how to use this.
 [application]
-database_url = "postgres://postgres:123456@postgres:5432/postgres"
+database_url = "postgres://postgres:123456@localhost:5432/postgres"
 file_path_url = "./files"

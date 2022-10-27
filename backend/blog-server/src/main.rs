@@ -23,6 +23,7 @@ pub mod util;
 
 #[macro_use]
 extern crate lazy_static;
+/// Application-specific settings
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Deserialize)]
 #[non_exhaustive]
 pub struct AppSettings {
@@ -73,7 +74,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     Settings::override_field_with_env_var(&mut settings.actix.mode, "MODE").ok();
     init_logger(&settings);
     let conn = Database::connect(&settings.application.database_url).await?;
-    log::info!("Server is running on {:?}", settings.actix.hosts);
+    log::info!("Starting server on {:?}", settings.actix.hosts);
     HttpServer::new({
         let settings = settings.to_owned();
         move || {
