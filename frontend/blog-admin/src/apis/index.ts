@@ -1,5 +1,5 @@
 import { FileQuery } from "./../models/index";
-import axios, { AxiosRequestConfig } from "axios";
+import axios, { AxiosError, AxiosRequestConfig } from "axios";
 import { router } from "@/routers";
 import { SortQuery, TagQuery, BlogQuery, BlogModel } from "@/models";
 // const { data, isFinished } = useAxios("/posts");
@@ -26,30 +26,26 @@ instance.interceptors.response.use(
     (response) => {
         return response;
     },
-    (error) => {
-        if (error && error.response.status) {
+    (error: AxiosError) => {
+        if (error.response && error.response.status) {
             switch (error.response.status) {
                 case 400:
-                    error.message = "请求出错";
+                    error.message += "请求出错";
                     break;
                 case 401:
-                    error.message = "授权失败，请重新登录";
-                    router.replace({ name: "login" });
+                    error.message += "授权失败，请重新登录";
                     break;
                 case 403:
-                    error.message = "拒绝访问，权限不足";
+                    error.message += "拒绝访问，权限不足";
                     break;
                 case 404:
-                    error.message = "未找到该资源";
+                    error.message += "未找到该资源";
                     break;
             }
-        } else if (!error.message) {
-            error.message = "连接服务器失败";
+        } else {
+            error.message += "连接服务器失败";
         }
-        if (error.response.data) {
-            error.message += `: ${error.response.data}`;
-        }
-        throw error;
+        return error;
     }
 );
 

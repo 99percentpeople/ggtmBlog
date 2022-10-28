@@ -190,7 +190,7 @@ pub async fn get_file(
     Ok(NamedFile::open_async(path)
         .await?
         .set_content_disposition(header::ContentDisposition {
-            disposition: header::DispositionType::Inline,
+            disposition: header::DispositionType::Attachment,
             parameters: file
                 .file_name
                 .and_then(|name| Some(vec![header::DispositionParam::Name(name)]))
