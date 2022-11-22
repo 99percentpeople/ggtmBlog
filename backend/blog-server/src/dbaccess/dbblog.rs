@@ -2,10 +2,8 @@ use super::*;
 
 use crate::{
     error::ServerError,
-    model::{BlogDetailItem, BlogListItem, BlogQuery, UpdateBlog, UserBriefInfo, BlogSearch},
+    model::{BlogDetailItem, BlogListItem, BlogQuery, BlogSearch, UpdateBlog, UserBriefInfo},
 };
-
-
 
 pub async fn blog_search(
     query: &BlogQuery,
@@ -112,12 +110,10 @@ pub async fn get_model_list_with_query(
     let data = data
         .into_iter()
         .map(|mut item| {
-            if let Some(true) = query.summary {
-            } else {
+            if let Some(false) | None = query.summary {
                 item.summary = None;
             }
-            if let Some(true) = query.cover {
-            } else {
+            if let Some(false) | None = query.cover {
                 item.cover = None;
             }
             item

@@ -66,7 +66,7 @@ fn build_indetity_service() -> IdentityService<CookieIdentityPolicy> {
 async fn main() -> Result<(), Box<dyn Error>> {
     let config_path =
         Path::new(&env::var("SERVER_CONFIG").unwrap_or("config.toml".to_owned())).to_owned();
-    let mut settings = <BasicSettings<AppSettings>>::parse_toml(config_path.to_owned()).expect(
+    let mut settings = <Settings>::parse_toml(config_path.to_owned()).expect(
         &format!("Failed to parse `Settings` from {:?}", config_path),
     );
     Settings::override_field_with_env_var(&mut settings.application.database_url, "DATABASE_URL")
