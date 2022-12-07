@@ -83,7 +83,7 @@ use actix_web::{
     Error as WebError, HttpServer,
 };
 use rustls::{Certificate, PrivateKey, ServerConfig};
-use rustls_pemfile::{certs, rsa_private_keys, pkcs8_private_keys};
+use rustls_pemfile::{certs, rsa_private_keys};
 use serde::{de, Deserialize};
 
 #[macro_use]
@@ -309,7 +309,7 @@ where
                 .unwrap();
             for Address { host, port } in &settings.actix.hosts {
                 self = self
-                    .bind_rustls(format!("{}:{}", host, port),  config.to_owned())
+                    .bind_rustls(format!("{}:{}", host, port), config.to_owned())
                     .unwrap();
             }
         } else {
