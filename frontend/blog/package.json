@@ -16,12 +16,12 @@
         "@vueuse/head": "^0.9.7",
         "@vueuse/integrations": "^8.2.3",
         "axios": "^0.26.1",
+        "common": "0.0.0",
         "md-editor-v3": "^2.3.0",
         "naive-ui": "^2.33.4",
         "pinia": "^2.0.12",
         "vue": "^3.2.25",
-        "vue-router": "4",
-        "common" :"0.0.0"
+        "vue-router": "4"
     },
     "devDependencies": {
         "@types/node": "^17.0.23",
@@ -33,6 +33,8 @@
         "unplugin-vue-components": "^0.18.4",
         "vite": "^3.1.0",
         "vite-plugin-compression": "^0.5.1",
+        "vite-plugin-mkcert": "^1.10.1",
+        "vite-plugin-pwa": "^0.13.3",
         "vue-tsc": "^1.0.0"
     }
 }

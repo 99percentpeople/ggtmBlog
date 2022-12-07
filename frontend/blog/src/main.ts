@@ -3,6 +3,9 @@ import { createPinia } from "pinia";
 import App from './App.vue'
 import { createHead } from "@vueuse/head";
 import { router } from "./routers";
+import { useRegisterSW } from 'virtual:pwa-register/vue'
+
+useRegisterSW()
 
 const head = createHead();
 const pinia = createPinia();

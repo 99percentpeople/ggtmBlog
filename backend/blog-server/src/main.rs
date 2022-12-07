@@ -66,15 +66,28 @@ fn build_indetity_service() -> IdentityService<CookieIdentityPolicy> {
 async fn main() -> Result<(), Box<dyn Error>> {
     let config_path =
         Path::new(&env::var("SERVER_CONFIG").unwrap_or("config.toml".to_owned())).to_owned();
-    let mut settings = <Settings>::parse_toml(config_path.to_owned()).expect(
-        &format!("Failed to parse `Settings` from {:?}", config_path),
-    );
+    let mut settings = Settings::parse_toml(config_path.to_owned()).expect(&format!(
+        "Failed to parse `Settings` from {}",
+        config_path.to_str().unwrap_or_default()
+    ));
     Settings::override_field_with_env_var(&mut settings.application.database_url, "DATABASE_URL")
         .ok();
     Settings::override_field_with_env_var(&mut settings.actix.mode, "MODE").ok();
     init_logger(&settings);
     let conn = Database::connect(&settings.application.database_url).await?;
-    log::info!("Starting server on {:?}", settings.actix.hosts);
+    let tls = settings.actix.tls.enabled;
+    settings.actix.hosts.iter().for_each(move |v| {
+        log::info!(
+            "Starting server on {}",
+            format!(
+                "{}://{}:{}",
+                if tls { "https" } else { "http" },
+                v.host,
+                v.port
+            )
+        )
+    });
+
     HttpServer::new({
         let settings = settings.to_owned();
         move || {

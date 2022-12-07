@@ -1,4 +1,34 @@
-**/node_modules/
-**/traget/
-**/dist/
+# Editor directories and files
 .vscode/*
+files
+.idea
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Build files and packages
+**/target
+**/tmp
+**/node_modules
+**/dist
+**/dev-dist
+**/dist-ssr
+*.local
+**/www
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

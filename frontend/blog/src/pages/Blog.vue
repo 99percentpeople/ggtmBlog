@@ -314,7 +314,7 @@ import {
   Comment24Regular,
 } from "@vicons/fluent";
 import MdEditor from "md-editor-v3";
-import "md-editor-v3/lib/style.css";
+
 import { useSetting, useLocalInfo, useMemory } from "@/stores";
 import { Ban } from "@vicons/ionicons5";
 import { Catalog } from "@vicons/carbon";
@@ -324,13 +324,12 @@ import { BlogDetailModel, CommentDetail, CommentModel } from "common/models";
 import { onBeforeRouteUpdate } from "vue-router";
 
 const setting = useSetting();
-const header = ref<HTMLElement | null>(document.getElementById("header"));
 const commentRef = ref<HTMLElement | null>(null);
+const header = document.querySelector<HTMLElement>("#header")!;
 const { height: headerHeight } = useElementSize(header);
-
 const memory = useMemory();
 const { reactiveSize } = storeToRefs(setting);
-const { width, height } = useWindowSize();
+const { width } = useWindowSize();
 const catalogList = ref([] as JSX.Element[]);
 const route = useRoute();
 
@@ -546,6 +545,7 @@ const commentPagination = reactive({
 </script>
 
 <style scoped lang="scss">
+
 :deep(h1),
 :deep(h2),
 :deep(h3),
@@ -561,7 +561,6 @@ const commentPagination = reactive({
   display: flex;
   justify-content: end;
   position: sticky;
-  // top: v-bind("`${headerHeight+12}px`");
   margin-top: 50%;
 }
 :deep(.affix-right) {
@@ -608,12 +607,14 @@ const commentPagination = reactive({
   display: block;
   height: 40px;
 }
+
+</style>
+
+<style lang="scss">
+@use "md-editor-v3/lib/style.css";
 .md {
-  :global(#{&}-dark) {
+  &-dark {
     --md-bk-color: transparent;
-  }
-  :global(#{&}-mermaid) {
-    text-align: center;
   }
 }
 </style>

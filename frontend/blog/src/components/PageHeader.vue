@@ -196,12 +196,13 @@ const menuOptions = [
   },
   {
     label: () => (
-      <a href={location.origin + import.meta.env.VITE_ADMIN_URL}>后台</a>
+      <a href={import.meta.env.VITE_ADMIN_URL}>后台</a>
     ),
     key: "admin",
     icon: () => <Guest24Regular />,
   },
 ];
+
 
 const lightThemeOverrides: GlobalThemeOverrides = {
   common: {

@@ -7,8 +7,11 @@
         "frontend/blog-admin"
     ],
     "scripts": {
-        "dev": "pwsh ./dev.ps1"
+        "dev": "concurrently \"cargo run --bin blog-server\" \"yarn workspace blog dev\" \"yarn workspace blog-admin dev\""
     },
     "version": "1.0.0",
-    "license": "MIT"
+    "license": "MIT",
+    "devDependencies": {
+        "concurrently": "^7.6.0"
+    }
 }
