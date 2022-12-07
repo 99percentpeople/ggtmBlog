@@ -113,7 +113,7 @@ const columns = createColumns({
         onDeleteFile(rowData.id);
     },
     preview(rowData: RowData) {
-        previewImageUrl.value = `${import.meta.env.VITE_BASE_URL}/file/${rowData.id}`;
+        previewImageUrl.value = `${import.meta.env.VITE_API_URL}/file/${rowData.id}`;
         imgTitle.value = rowData.file_name;
         showModal.value = true;
     },
@@ -135,7 +135,7 @@ async function onUploadFile({ file, data, headers, withCredentials, onFinish, on
                 onProgress({ percent: Math.ceil((loaded / total) * 100) });
             },
         } as AxiosRequestConfig);
-        file.url = `${import.meta.env.VITE_BASE_URL as string}/file/${data.id}`;
+        file.url = `${import.meta.env.VITE_API_URL}/file/${data.id}`;
         onFinish();
         await createFileList(pagination.pageSize, pagination.page);
     } catch ({ message: msg }) {

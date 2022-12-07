@@ -24,7 +24,6 @@ WORKDIR /usr/local/bin
 COPY --from=build-backend /usr/src/target/release/blog-server ./blog-server
 COPY --from=build-backend /usr/src/target/release/migration ./migration
 COPY --from=build-frontend /usr/src/www ./www
-COPY ./config.toml ./config.toml
 ENV SERVER_CONFIG=/etc/blog-server/config.toml
 ENV MODE=production
 CMD [ "blog-server" ]

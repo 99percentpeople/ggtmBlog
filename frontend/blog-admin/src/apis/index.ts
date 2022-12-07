@@ -34,6 +34,7 @@ instance.interceptors.response.use(
                     break;
                 case 401:
                     error.message += "授权失败，请重新登录";
+                    router.replace({ name: "login" })
                     break;
                 case 403:
                     error.message += "拒绝访问，权限不足";
@@ -45,7 +46,7 @@ instance.interceptors.response.use(
         } else {
             error.message += "连接服务器失败";
         }
-        return error;
+        throw error;
     }
 );
 

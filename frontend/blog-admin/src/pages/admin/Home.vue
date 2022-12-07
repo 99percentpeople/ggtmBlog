@@ -1,15 +1,13 @@
 <template>
     <n-space vertical align="stretch" item-style="display:flex;flex-direction:column;align-items:center">
-        <n-card
-            style="max-width: 1280px"
-            :segmented="{
-                content: true,
-            }"
-            header-style="padding:12px"
-        >
+        <n-card style="max-width: 1280px" :segmented="{
+            content: true,
+        }" header-style="padding:12px">
             <template #header>
                 <n-h3 style="display: flex; align-items: center; margin: 0">
-                    <n-icon> <List24Regular /> </n-icon>管理
+                    <n-icon>
+                        <List24Regular />
+                    </n-icon>管理
                 </n-h3>
             </template>
             <n-form ref="formRef" inline :model="blogQuery" size="medium" label-placement="left">
@@ -26,7 +24,8 @@
                     <n-button attr-type="button" @click="onSearch">搜索</n-button>
                 </n-form-item>
             </n-form>
-            <n-data-table size="small" remote :loading="loadingRef" :bordered="false" :columns="columns" :data="dataRef" :pagination="pagination" />
+            <n-data-table size="small" remote :loading="loadingRef" :bordered="false" :columns="columns" :data="dataRef"
+                :pagination="pagination" />
             <template #action>
                 <n-space justify="end">
                     <n-button type="primary" @click="onNewBlog">新增</n-button>
@@ -219,5 +218,3 @@ const pagination = reactive({
     },
 });
 </script>
-
-<style scoped></style>

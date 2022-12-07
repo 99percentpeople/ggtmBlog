@@ -39,6 +39,7 @@ export default ({ command, mode }: ConfigEnv) =>
             VitePWA({
                 registerType: 'autoUpdate',
                 workbox: {
+                    navigateFallbackDenylist:[/admin/i],
                     runtimeCaching: [
                         {
                             urlPattern: /api\/(.*?)/i, // 接口缓存 此处填你想缓存的接口正则匹配

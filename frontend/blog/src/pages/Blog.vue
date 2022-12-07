@@ -1,23 +1,10 @@
 <template>
   <div class="view-wrapper">
     <n-back-top style="z-index: 10" />
-    <n-grid
-      class="wrapper"
-      x-gap="6"
-      y-gap="6"
-      cols="4 s:6 m:10"
-      item-responsive
-      responsive="screen"
-    >
+    <n-grid class="wrapper" x-gap="6" y-gap="6" cols="4 s:6 m:10" item-responsive responsive="screen">
       <n-gi span="0 m:2" class="affix-left">
         <n-space vertical>
-          <n-button
-            circle
-            tertiary
-            size="large"
-            v-if="blog.enable_comment"
-            @click="commentInstRef?.focus()"
-          >
+          <n-button circle tertiary size="large" v-if="blog.enable_comment" @click="commentInstRef?.focus()">
             <template #icon>
               <Comment24Regular />
             </template>
@@ -35,23 +22,16 @@
         </n-space>
       </n-gi>
       <n-gi span="4 s:5 m:6">
-        <n-card
-          header-style="padding:0 20px;padding-top:6px;"
-          content-style="padding:12px"
-          footer-style="padding:6px 12px"
-          :segmented="{
+        <n-card header-style="padding:0 20px;padding-top:6px;" content-style="padding:12px"
+          footer-style="padding:6px 12px" :segmented="{
             content: true,
             footer: true,
             action: true,
-          }"
-        >
+          }">
           <template #header>
-            <n-space
-              vertical
-              :align="width > reactiveSize.s ? 'start' : 'center'"
-            >
+            <n-space vertical :align="width > reactiveSize.s ? 'start' : 'center'">
               <n-text tag="h3" :id="blog.title" :href="`#${blog.title}`">{{
-                blog.title
+                  blog.title
               }}</n-text>
               <n-text depth="3" tag="small">
                 {{ blog.summary }}
@@ -83,30 +63,23 @@
             <n-space align="end" :size="6">
               <n-tag type="info" size="small">{{ blog.sort?.name }}</n-tag>
               <n-tag v-for="tag in blog.tags" size="small">{{
-                tag.name
+                  tag.name
               }}</n-tag>
             </n-space>
           </n-space>
 
           <n-space vertical align="center" style="margin: 6px 0">
-            <n-image
-              v-if="blog.cover"
-              :src="blog.cover"
-              :img-props="{
-                style: `display:inline-block;max-height:250px;max-width:100%;border-radius:6px;`,
-              }"
-            />
+            <n-image v-if="blog.cover" :src="blog.cover" :img-props="{
+              style: `display:inline-block;max-height:250px;max-width:100%;border-radius:6px;`,
+            }" />
           </n-space>
           <n-divider style="margin: 6px"></n-divider>
 
-          <md-editor
-            :theme="setting.isDark ? 'dark' : 'light'"
-            :marked-image="markedImage"
-            @get-catalog="(list) => (catalogList = renderCatalog(list))"
-            previewOnly
-            v-model="blog.content"
-            previewTheme="github"
-          ></md-editor>
+          <md-editor previewOnly :theme="setting.isDark ? 'dark' : 'light'" :marked-image="markedImage"
+            @get-catalog="(list) => (catalogList = renderCatalog(list))" v-model="blog.content" previewTheme="github"
+            :style="{
+              background: 'transparent'
+            }"></md-editor>
 
           <template #footer>
             <n-space justify="center" v-if="blog.appreciation">
@@ -126,16 +99,18 @@
               </n-descriptions-item>
               <n-descriptions-item label="发表时间">
                 <n-text depth="3">{{
-                  blog.create_time?.toLocaleString()
+                    blog.create_time?.toLocaleString()
                 }}</n-text>
               </n-descriptions-item>
               <n-descriptions-item label="最后更新" v-if="blog.update_time">
                 <n-text depth="3">{{
-                  blog.update_time.toLocaleString()
+                    blog.update_time.toLocaleString()
                 }}</n-text>
               </n-descriptions-item>
               <n-descriptions-item label="版权声明" v-if="blog.share_statement">
-                <n-icon color="#cc0000" size="12px"><Ban /></n-icon>
+                <n-icon color="#cc0000" size="12px">
+                  <Ban />
+                </n-icon>
                 <n-text depth="3"> 未经作者授权，禁止转载</n-text>
               </n-descriptions-item>
             </n-descriptions>
@@ -152,17 +127,11 @@
         </div>
       </n-gi>
       <n-gi offset="0 m:2" span="5 m:6">
-        <n-card
-          ref="commentRef"
-          v-if="blog.enable_comment"
-          header-style="padding:6px 12px"
-          content-style="padding:6px;margin:0;"
-          footer-style="padding:6px"
-          :segmented="{
+        <n-card ref="commentRef" v-if="blog.enable_comment" header-style="padding:6px 12px"
+          content-style="padding:6px;margin:0;" footer-style="padding:6px" :segmented="{
             content: 'soft',
             footer: true,
-          }"
-        >
+          }">
           <template #header>
             <n-space align="baseline">
               评论
@@ -172,119 +141,59 @@
             </n-space>
           </template>
           <n-space vertical>
-            <visitor-comment
-              v-for="c in comments"
-              :model="c"
-              :loading="loadingComment"
-              @reply="onReply"
-            ></visitor-comment>
-            <n-pagination
-              v-if="commentPagination.pageCount > 1"
-              :page="commentPagination.page"
-              :page-count="commentPagination.pageCount"
-              :page-size="commentPagination.pageSize"
-              @update-page="commentPagination.onChange"
-              @update-page-size="commentPagination.onUpdatePageSize"
-              style="justify-content: center"
-              :show-size-picker="commentPagination.showSizePicker"
-              :page-sizes="commentPagination.pageSizes"
-            >
+            <visitor-comment v-for="c in comments" :model="c" :loading="loadingComment"
+              @reply="onReply"></visitor-comment>
+            <n-pagination v-if="commentPagination.pageCount > 1" :page="commentPagination.page"
+              :page-count="commentPagination.pageCount" :page-size="commentPagination.pageSize"
+              @update-page="commentPagination.onChange" @update-page-size="commentPagination.onUpdatePageSize"
+              style="justify-content: center" :show-size-picker="commentPagination.showSizePicker"
+              :page-sizes="commentPagination.pageSizes">
             </n-pagination>
           </n-space>
 
           <template #footer>
-            <n-card
-              header-style="padding:6px 12px"
-              content-style="padding:6px"
-              footer-style="padding:6px"
-              :bordered="false"
-            >
+            <n-card header-style="padding:6px 12px" content-style="padding:6px" footer-style="padding:6px"
+              :bordered="false">
               <template #header>发布评论</template>
               <n-form label-placement="left">
-                <n-grid
-                  cols="1 s:2 m:4"
-                  :model="comment"
-                  x-gap="12"
-                  responsive="screen"
-                  item-responsive
-                >
+                <n-grid cols="1 s:2 m:4" :model="comment" x-gap="12" responsive="screen" item-responsive>
                   <n-form-item-gi span="4">
-                    <n-input
-                      ref="commentInstRef"
-                      type="textarea"
-                      :placeholder="
-                        nameToReply ? `回复 @${nameToReply}:` : `发表你的看法`
-                      "
-                      :minlength="10"
-                      :maxlength="200"
-                      show-count
-                      :autosize="{
-                        minRows: 3,
-                        maxRows: 5,
-                      }"
-                      v-model:value="comment.content"
-                    ></n-input>
+                    <n-input ref="commentInstRef" type="textarea" :placeholder="
+                      nameToReply ? `回复 @${nameToReply}:` : `发表你的看法`
+                    " :minlength="10" :maxlength="200" show-count :autosize="{
+  minRows: 3,
+  maxRows: 5,
+}" v-model:value="comment.content"></n-input>
                   </n-form-item-gi>
                   <n-form-item-gi span="1" label="昵称">
-                    <n-input
-                      placeholder="请输入3~10个汉字或字母 必填"
-                      v-model:value="comment.nickname"
-                    ></n-input>
+                    <n-input placeholder="请输入3~10个汉字或字母 必填" v-model:value="comment.nickname"></n-input>
                   </n-form-item-gi>
                   <n-form-item-gi span="1" label="邮箱">
-                    <n-input
-                      placeholder="请输入邮箱 必填"
-                      v-model:value="comment.email"
-                    ></n-input>
+                    <n-input placeholder="请输入邮箱 必填" v-model:value="comment.email"></n-input>
                   </n-form-item-gi>
                   <n-form-item-gi span="1" label="头像">
-                    <n-input
-                      :input-props="{ type: 'url' }"
-                      placeholder="输入头像url 可空"
-                      v-model:value="comment.avatar"
-                    ></n-input>
+                    <n-input :input-props="{ type: 'url' }" placeholder="输入头像url 可空"
+                      v-model:value="comment.avatar"></n-input>
                   </n-form-item-gi>
                   <n-form-item-gi span="1" suffix>
-                    <n-space
-                      justify="center"
-                      align="center"
-                      style="width: 100%"
-                      :wrap="false"
-                    >
-                      <n-checkbox
-                        label="记住信息"
-                        v-model:checked="localInfo.commentInfo.remember"
-                      />
-                      <n-button
-                        round
-                        secondary
-                        type="error"
-                        @click="reSetComment"
-                        v-if="nameToReply"
-                      >
+                    <n-space justify="center" align="center" style="width: 100%" :wrap="false">
+                      <n-checkbox label="记住信息" v-model:checked="localInfo.commentInfo.remember" />
+                      <n-button round secondary type="error" @click="reSetComment" v-if="nameToReply">
                         <template #icon>
-                          <n-icon><ArrowSync20Regular /></n-icon>
+                          <n-icon>
+                            <ArrowSync20Regular />
+                          </n-icon>
                         </template>
                         重置
                       </n-button>
-                      <n-button
-                        size="large"
-                        type="info"
-                        @click="onPublish"
-                        v-if="nameToReply"
-                      >
+                      <n-button size="large" type="info" @click="onPublish" v-if="nameToReply">
                         回复
                         <template #icon>
                           <ArrowReply24Regular />
                         </template>
                       </n-button>
 
-                      <n-button
-                        size="large"
-                        type="info"
-                        @click="onPublish"
-                        v-else
-                      >
+                      <n-button size="large" type="info" @click="onPublish" v-else>
                         发布
                         <template #icon>
                           <ArrowAutofitUp24Regular />
@@ -545,7 +454,6 @@ const commentPagination = reactive({
 </script>
 
 <style scoped lang="scss">
-
 :deep(h1),
 :deep(h2),
 :deep(h3),
@@ -563,14 +471,17 @@ const commentPagination = reactive({
   position: sticky;
   margin-top: 50%;
 }
+
 :deep(.affix-right) {
   max-height: calc(60vh - v-bind("`${headerHeight+12}px`"));
 }
+
 .blur-wrapper {
   margin: 0;
   position: sticky;
   top: v-bind("`${headerHeight+12}px`");
 }
+
 .blur-wrapper::after {
   content: "";
   position: absolute;
@@ -579,42 +490,34 @@ const commentPagination = reactive({
   right: 0;
   bottom: -1px;
   backdrop-filter: blur(1000px);
-  mask: linear-gradient(
-    to top,
-    black 0%,
-    10%,
-    transparent 90%,
-    95%,
-    black 100%
-  );
-  -webkit-mask: linear-gradient(
-    to top,
-    black 0%,
-    10%,
-    transparent 90%,
-    95%,
-    black 100%
-  );
+  mask: linear-gradient(to top,
+      black 0%,
+      10%,
+      transparent 90%,
+      95%,
+      black 100%);
+  -webkit-mask: linear-gradient(to top,
+      black 0%,
+      10%,
+      transparent 90%,
+      95%,
+      black 100%);
   pointer-events: none;
 }
+
 .anchor::before {
   content: "";
   display: block;
   height: 40px;
 }
+
 .anchor::after {
   content: "";
   display: block;
   height: 40px;
 }
-
 </style>
 
 <style lang="scss">
 @use "md-editor-v3/lib/style.css";
-.md {
-  &-dark {
-    --md-bk-color: transparent;
-  }
-}
 </style>

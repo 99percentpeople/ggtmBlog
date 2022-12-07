@@ -70,9 +70,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
         "Failed to parse `Settings` from {}",
         config_path.to_str().unwrap_or_default()
     ));
+    Settings::override_field_with_env_var(&mut settings.actix.mode, "MODE").ok();
     Settings::override_field_with_env_var(&mut settings.application.database_url, "DATABASE_URL")
         .ok();
-    Settings::override_field_with_env_var(&mut settings.actix.mode, "MODE").ok();
     init_logger(&settings);
     let conn = Database::connect(&settings.application.database_url).await?;
     let tls = settings.actix.tls.enabled;
@@ -91,6 +91,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     HttpServer::new({
         let settings = settings.to_owned();
         move || {
+            log::debug!("{:?}", settings.actix.mode);
             App::new()
                 .app_data(web::Data::new(settings.to_owned()))
                 .app_data(web::Data::new(conn.to_owned()))

@@ -7,11 +7,14 @@
         "frontend/blog-admin"
     ],
     "scripts": {
-        "dev": "concurrently \"cargo run --bin blog-server\" \"yarn workspace blog dev\" \"yarn workspace blog-admin dev\""
+        "dev": "cargo build && concurrently \"cargo run --bin blog-server\" \"yarn workspace blog dev\" \"yarn workspace blog-admin dev\"",
+        "build": "yarn workspaces run build",
+        "preview": "cross-env MODE=production cargo run --bin blog-server"
     },
     "version": "1.0.0",
     "license": "MIT",
     "devDependencies": {
-        "concurrently": "^7.6.0"
+        "concurrently": "^7.6.0",
+        "cross-env": "^7.0.3"
     }
 }

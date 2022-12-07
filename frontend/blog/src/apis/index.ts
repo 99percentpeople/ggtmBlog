@@ -19,7 +19,7 @@ instance.interceptors.response.use(
                     break;
                 case 401:
                     error.message = "授权失败，请重新登录";
-                    router.push({ name: "login" });
+                    router.replace({ name: "login" });
                     break;
                 case 403:
                     error.message = "拒绝访问，权限不足";
