@@ -1,4 +1,4 @@
-use std::{env, error::Error, path::Path, time::Duration};
+use std::{env, error::Error, fs::File, io::BufReader, path::Path, time::Duration};
 
 use actix_extensible_rate_limit::{
     backend::{memory::InMemoryBackend, SimpleInputFunctionBuilder},
@@ -13,6 +13,8 @@ use actix_web::{
 };
 use actix_web_lab::web::spa;
 use anyhow::Result;
+use rustls::{Certificate, PrivateKey, ServerConfig};
+use rustls_pemfile::{certs, pkcs8_private_keys};
 use sea_orm::Database;
 use serde::Deserialize;
 pub mod dbaccess;
@@ -73,6 +75,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     Settings::override_field_with_env_var(&mut settings.actix.mode, "MODE").ok();
     Settings::override_field_with_env_var(&mut settings.application.database_url, "DATABASE_URL")
         .ok();
+
     init_logger(&settings);
     let conn = Database::connect(&settings.application.database_url).await?;
     let tls = settings.actix.tls.enabled;
@@ -153,3 +156,4 @@ async fn main() -> Result<(), Box<dyn Error>> {
     .await?;
     Ok(())
 }
+

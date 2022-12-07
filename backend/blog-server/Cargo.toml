@@ -7,7 +7,7 @@ edition = "2021"
 entity = { path = "../entity" }
 migration = { path = "../migration" }
 
-actix-web = "4.0"
+actix-web = { version = "4.2", features = ["rustls"] }
 actix-identity = "0.4.0"
 serde_json = "1.0"
 chrono = "0.4"
@@ -33,7 +33,10 @@ actix-files = "0.6"
 uuid = { version = "1.0", features = ["serde", "v4"] }
 actix-extensible-rate-limit = "0.2.1"
 lazy_static = "1.4"
-thiserror = "*"
-anyhow = "*"
-actix-settings = "0.6.0"
-actix-web-lab = "0.17.0"
+thiserror = "1.0.37"
+anyhow = "1.0.66"
+actix-settings = {path = "../actix-settings"}
+actix-web-lab = "0.18.5"
+
+rustls = "0.20.2"
+rustls-pemfile = "1"

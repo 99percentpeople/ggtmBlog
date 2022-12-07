@@ -1,9 +1,8 @@
-
 [actix]
 # For more info, see: https://docs.rs/actix-web/4/actix_web/struct.HttpServer.html.
 
 hosts = [
-    ["0.0.0.0", 8080]      # This should work for both development and deployment...
+    ["0.0.0.0", 9000]      # This should work for both development and deployment...
     #                      # ... but other entries are possible, as well.
 ]
 mode = "development"       # Either "development" or "production".
@@ -64,12 +63,10 @@ client-shutdown = "default"
 shutdown-timeout = "default"
 
 [actix.tls] # TLS is disabled by default because the certs don't exist
-enabled = true
-certificate = "./127.0.0.1+1.pem"
-private-key = "./127.0.0.1+1-key.pem"
+enabled = false
+certificate = "path/to/cert/cert.pem"
+private-key = "path/to/cert/key.pem"
 
 # The `application` table be used to express application-specific settings.
 # See the `README.md` file for more details on how to use this.
 [application]
-database_url = "postgres://postgres:123456@localhost:5432/postgres"
-file_path_url = "./files"
