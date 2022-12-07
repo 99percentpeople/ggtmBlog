@@ -1,4 +1,4 @@
-use std::{env, error::Error, fs::File, io::BufReader, path::Path, time::Duration};
+use std::{env, error::Error, path::Path, time::Duration};
 
 use actix_extensible_rate_limit::{
     backend::{memory::InMemoryBackend, SimpleInputFunctionBuilder},
@@ -13,8 +13,6 @@ use actix_web::{
 };
 use actix_web_lab::web::spa;
 use anyhow::Result;
-use rustls::{Certificate, PrivateKey, ServerConfig};
-use rustls_pemfile::{certs, pkcs8_private_keys};
 use sea_orm::Database;
 use serde::Deserialize;
 pub mod dbaccess;
