@@ -35,8 +35,7 @@ actix-extensible-rate-limit = "0.2.1"
 lazy_static = "1.4"
 thiserror = "1.0.37"
 anyhow = "1.0.66"
-actix-settings = {path = "../actix-settings"}
+actix-settings = { git = "https://github.com/LitangDingzhen/actix-extras.git", features = [
+    "rustls",
+] }
 actix-web-lab = "0.18.5"
-
-rustls = "0.20.2"
-rustls-pemfile = "1"

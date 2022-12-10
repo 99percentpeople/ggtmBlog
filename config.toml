@@ -65,8 +65,8 @@ shutdown-timeout = "default"
 
 [actix.tls] # TLS is disabled by default because the certs don't exist
 enabled = true
-certificate = "./127.0.0.1+1.pem"
-private-key = "./127.0.0.1+1-key.pem"
+certificate = "./localhost.crt"
+private-key = "./localhost.key"
 
 # The `application` table be used to express application-specific settings.
 # See the `README.md` file for more details on how to use this.

@@ -92,7 +92,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
     HttpServer::new({
         let settings = settings.to_owned();
         move || {
-            log::debug!("{:?}", settings.actix.mode);
             App::new()
                 .app_data(web::Data::new(settings.to_owned()))
                 .app_data(web::Data::new(conn.to_owned()))
