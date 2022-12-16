@@ -21,7 +21,7 @@ pub fn sort_handler(cfg: &mut web::ServiceConfig) {
 
 #[get("/{page_size}/{index}")]
 async fn get_sort_list(
-    path: web::Path<(usize, usize)>,
+    path: web::Path<(u64, u64)>,
     query: web::Query<SortQuery>,
     conn: web::Data<DatabaseConnection>,
 ) -> ServerResult<impl Responder> {

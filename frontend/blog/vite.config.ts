@@ -5,14 +5,15 @@ import Components from "unplugin-vue-components/vite";
 import { NaiveUiResolver } from "unplugin-vue-components/resolvers";
 import { ConfigEnv, defineConfig } from "vite";
 import compressPlugin from "vite-plugin-compression";
-import mkcert from 'vite-plugin-mkcert';
-import { VitePWA } from 'vite-plugin-pwa';
+import mkcert from "vite-plugin-mkcert";
+import { VitePWA } from "vite-plugin-pwa";
 import { resolve } from "path";
+import fs from "fs";
 // https://vitejs.dev/config/
 export default ({ command, mode }: ConfigEnv) =>
     defineConfig({
         build: {
-            outDir: "../../www/blog"
+            outDir: "../../www/blog",
         },
         plugins: [
             vue(),
@@ -37,53 +38,53 @@ export default ({ command, mode }: ConfigEnv) =>
                 ext: ".gz",
             }),
             VitePWA({
-                registerType: 'autoUpdate',
+                registerType: "autoUpdate",
                 workbox: {
-                    navigateFallbackDenylist:[/admin/i],
+                    navigateFallbackDenylist: [/admin/i],
                     runtimeCaching: [
                         {
                             urlPattern: /api\/(.*?)/i, // 接口缓存 此处填你想缓存的接口正则匹配
-                            handler: 'CacheFirst',
+                            handler: "CacheFirst",
                             options: {
-                                cacheName: 'interface-cache',
+                                cacheName: "interface-cache",
                             },
                         },
                         {
                             urlPattern: /(.*?)\.(js|css|ts)/, // js /css /ts静态资源缓存
-                            handler: 'CacheFirst',
+                            handler: "CacheFirst",
                             options: {
-                                cacheName: 'js-css-cache',
+                                cacheName: "js-css-cache",
                             },
                         },
                         {
                             urlPattern: /(.*?)\.(png|jpe?g|svg|gif|bmp|psd|tiff|tga|eps)/, // 图片缓存
-                            handler: 'CacheFirst',
+                            handler: "CacheFirst",
                             options: {
-                                cacheName: 'image-cache',
+                                cacheName: "image-cache",
                             },
                         },
                     ],
                 },
                 manifest: {
-                    name: 'ggtmBlog',
-                    short_name: 'blog',
-                    description: 'blog App',
-                    theme_color: '#ffffff',
+                    name: "ggtmBlog",
+                    short_name: "blog",
+                    description: "blog App",
+                    theme_color: "#ffffff",
                     icons: [
                         {
-                            src: 'pwa-192x192.png',
-                            sizes: '192x192',
-                            type: 'image/png'
+                            src: "pwa-192x192.png",
+                            sizes: "192x192",
+                            type: "image/png",
                         },
                         {
-                            src: 'pwa-512x512.png',
-                            sizes: '512x512',
-                            type: 'image/png'
-                        }
-                    ]
-                }
+                            src: "pwa-512x512.png",
+                            sizes: "512x512",
+                            type: "image/png",
+                        },
+                    ],
+                },
             }),
-            mkcert()
+            mkcert(),
         ],
         resolve: {
             alias: {
@@ -95,9 +96,18 @@ export default ({ command, mode }: ConfigEnv) =>
             port: 3000,
             proxy: {
                 "^/api": {
-                    target: "http://localhost:8080",
+                    ssl: {
+                        key: fs.readFileSync(resolve(__dirname, "../../localhost.key"), "utf8"),
+                        cert: fs.readFileSync(resolve(__dirname, "../../localhost.crt"), "utf8"),
+                    },
                     changeOrigin: true,
+                    target: {
+                        protocol: "https:",
+                        host: "localhost",
+                        port: 8080,
+                    },
+                    secure: true,
                 },
-            }
-        }
+            },
+        },
     });

@@ -21,7 +21,7 @@ pub fn tag_handler(cfg: &mut web::ServiceConfig) {
 
 #[get("/{page_size}/{index}")]
 async fn get_tag_list(
-    path: web::Path<(usize, usize)>,
+    path: web::Path<(u64, u64)>,
     query: web::Query<TagQuery>,
     conn: web::Data<DatabaseConnection>,
 ) -> ServerResult<impl Responder> {

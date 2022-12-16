@@ -39,10 +39,10 @@ pub async fn blog_search(
 
 pub async fn get_model_list_with_query(
     query: &BlogQuery,
-    path: (usize, usize),
+    path: (u64, u64),
     conn: &DatabaseConnection,
     published: bool,
-) -> ServerResult<(Vec<blog::Model>, usize, usize)> {
+) -> ServerResult<(Vec<blog::Model>, u64, u64)> {
     let (page_size, index) = path;
 
     let pages = blog::Entity::find()
@@ -125,10 +125,10 @@ pub async fn get_model_list_with_query(
 
 pub async fn get_item_list_with_query(
     query: &BlogQuery,
-    path: (usize, usize),
+    path: (u64, u64),
     conn: &DatabaseConnection,
     published: bool,
-) -> ServerResult<(Vec<BlogListItem>, usize, usize)> {
+) -> ServerResult<(Vec<BlogListItem>, u64, u64)> {
     let (data, pages, items) = get_model_list_with_query(query, path, conn, published).await?;
     let handles = data.into_iter().map(|blog| {
         let conn = conn.to_owned();

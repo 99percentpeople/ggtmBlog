@@ -136,7 +136,7 @@ async fn upload_file(
     settings: web::Data<Settings>,
 ) -> ServerResult<impl Responder> {
     let user_info = try_verify(&id, 3)?;
-    let base_path = settings.application.file_path_url.to_owned();
+    let base_path = settings.application.file_url.to_owned();
     let user_dir = format!("{}-{}", user_info.id, user_info.username);
     let mut path: path::PathBuf = [&base_path, &user_dir].iter().collect();
 
@@ -178,7 +178,7 @@ pub async fn get_file(
     conn: web::Data<DatabaseConnection>,
     settings: web::Data<Settings>,
 ) -> ServerResult<impl Responder> {
-    let base_path = settings.application.file_path_url.to_owned();
+    let base_path = settings.application.file_url.to_owned();
     let file_id = path.into_inner();
     let file = file::Entity::find_by_id(file_id)
         .one(&conn as &DatabaseConnection)
@@ -207,7 +207,7 @@ pub async fn delete_file(
     settings: web::Data<Settings>,
 ) -> ServerResult<impl Responder> {
     try_verify(&id, 3)?;
-    let base_path = settings.application.file_path_url.to_owned();
+    let base_path = settings.application.file_url.to_owned();
     let file_id = path.into_inner();
     let old = file::Entity::find_by_id(file_id)
         .one(&conn as &DatabaseConnection)
@@ -239,7 +239,7 @@ pub async fn delete_file(
 #[get("/info/{page_size}/{index}")]
 async fn get_files_for_user(
     id: Identity,
-    path: web::Path<(usize, usize)>,
+    path: web::Path<(u64, u64)>,
     conn: web::Data<DatabaseConnection>,
 ) -> ServerResult<impl Responder> {
     let user_info = try_verify(&id, 3)?;
@@ -282,7 +282,7 @@ async fn put_file(
         .one(&conn as &DatabaseConnection)
         .await?
         .ok_or(ErrorNotFound("未找到该文件"))?;
-    let base_path = settings.application.file_path_url.to_owned();
+    let base_path = settings.application.file_url.to_owned();
     let path: path::PathBuf = [&base_path, &file.path].iter().collect();
 
     update_file(payload, &path).await?;

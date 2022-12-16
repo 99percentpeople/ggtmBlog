@@ -6,11 +6,10 @@ use crate::{
 use actix_web::{error::ErrorNotFound, rt};
 use async_recursion::async_recursion;
 
-
 pub async fn get_comments(
-    path: (i32, usize, usize),
+    path: (i32, u64, u64),
     conn: &DatabaseConnection,
-) -> ServerResult<(Vec<Comments>, usize, usize)> {
+) -> ServerResult<(Vec<Comments>, u64, u64)> {
     let (blog_id, page_size, index) = path;
     let blog = blog::Entity::find_by_id(blog_id)
         .one(conn)
@@ -50,7 +49,7 @@ pub async fn get_comments(
             sub_comments: e
                 .sub_comments
                 .into_iter()
-                .flat_map(|c| -> Vec<comment::Model> { c.into() })
+                .flat_map(Into::<Vec<comment::Model>>::into)
                 .collect(),
         })
         .collect();

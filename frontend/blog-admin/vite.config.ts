@@ -6,14 +6,15 @@ import { NaiveUiResolver } from "unplugin-vue-components/resolvers";
 import { ConfigEnv, defineConfig } from "vite";
 import compressPlugin from "vite-plugin-compression";
 import path, { resolve } from "path";
-import { loadEnv } from 'vite'
+import { loadEnv } from "vite";
+import fs from "fs";
 
 // https://vitejs.dev/config/
 export default ({ command, mode }: ConfigEnv) =>
     defineConfig({
         base: loadEnv(mode, process.cwd()).VITE_ADMIN_URL,
         build: {
-            outDir: "../../www/blog-admin"
+            outDir: "../../www/blog-admin",
         },
         plugins: [
             vue(),
@@ -49,9 +50,14 @@ export default ({ command, mode }: ConfigEnv) =>
             base: "/admin",
             proxy: {
                 "^/api": {
-                    target: "http://localhost:8080",
+                    ssl: {
+                        key: fs.readFileSync(resolve(__dirname, "../../localhost.key"), "utf8"),
+                        cert: fs.readFileSync(resolve(__dirname, "../../localhost.crt"), "utf8"),
+                    },
                     changeOrigin: true,
+                    target: "https://localhost:8080",
+                    secure: true,
                 },
-            }
-        }
+            },
+        },
     });

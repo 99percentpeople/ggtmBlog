@@ -41,7 +41,7 @@ pub async fn get_one_blog(
 
 #[get("/{page_size}/{index}")]
 pub async fn get_blog_list_item(
-    path: web::Path<(usize, usize)>,
+    path: web::Path<(u64, u64)>,
     params: web::Query<BlogQuery>,
     conn: web::Data<DatabaseConnection>,
 ) -> ServerResult<impl Responder> {

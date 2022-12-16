@@ -13,7 +13,7 @@ use actix_web::{
 };
 use actix_web_lab::web::spa;
 use anyhow::Result;
-use sea_orm::Database;
+use sea_orm::{ConnectOptions, Database};
 use serde::Deserialize;
 pub mod dbaccess;
 pub mod error;
@@ -25,10 +25,11 @@ pub mod util;
 extern crate lazy_static;
 /// Application-specific settings
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Deserialize)]
+#[serde(rename_all = "kebab-case")]
 #[non_exhaustive]
 pub struct AppSettings {
     database_url: String,
-    file_path_url: String,
+    file_url: String,
 }
 /// Convenience type alias for [`BasicSettings`] with [`AppSettings`].
 pub type Settings = BasicSettings<AppSettings>;
@@ -75,7 +76,12 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .ok();
 
     init_logger(&settings);
-    let conn = Database::connect(&settings.application.database_url).await?;
+
+    let mut opt = ConnectOptions::new(settings.application.database_url.to_owned());
+    opt.sqlx_logging(true) // Enable SQLx log
+        .sqlx_logging_level(log::LevelFilter::Debug); // Setting SQLx log level
+    let conn = Database::connect(opt).await?;
+
     let tls = settings.actix.tls.enabled;
     settings.actix.hosts.iter().for_each(move |v| {
         log::info!(
@@ -153,4 +159,3 @@ async fn main() -> Result<(), Box<dyn Error>> {
     .await?;
     Ok(())
 }
-

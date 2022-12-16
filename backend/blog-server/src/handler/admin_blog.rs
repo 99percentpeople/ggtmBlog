@@ -42,7 +42,7 @@ pub async fn get_bolg_search_result(
 #[get("/{page_size}/{index}")]
 pub async fn get_blog_list_item(
     id: Identity,
-    path: web::Path<(usize, usize)>,
+    path: web::Path<(u64, u64)>,
     params: web::Query<BlogQuery>,
     conn: web::Data<DatabaseConnection>,
 ) -> ServerResult<impl Responder> {
@@ -65,7 +65,7 @@ pub async fn get_blog_list_item(
 #[get("detail/{page_size}/{index}")]
 pub async fn get_blog_list(
     id: Identity,
-    path: web::Path<(usize, usize)>,
+    path: web::Path<(u64, u64)>,
     params: web::Query<BlogQuery>,
     conn: web::Data<DatabaseConnection>,
 ) -> ServerResult<impl Responder> {

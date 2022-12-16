@@ -8,9 +8,9 @@ pub struct SortAndBlogCount {
 }
 pub async fn get_list_with_query(
     query: &SortQuery,
-    path: (usize, usize),
+    path: (u64, u64),
     conn: &DatabaseConnection,
-) -> ServerResult<(Vec<SortAndBlogCount>, usize, usize)> {
+) -> ServerResult<(Vec<SortAndBlogCount>, u64, u64)> {
     let (page_size, index) = path;
 
     let pages = sort::Entity::find()

@@ -10,9 +10,9 @@ pub struct TagAndBlogCount {
 }
 pub async fn get_list_with_query(
     query: &TagQuery,
-    path: (usize, usize),
+    path: (u64, u64),
     conn: &DatabaseConnection,
-) -> ServerResult<(Vec<TagAndBlogCount>, usize, usize)> {
+) -> ServerResult<(Vec<TagAndBlogCount>, u64, u64)> {
     let (page_size, index) = path;
 
     let pages = tag::Entity::find()

@@ -63,7 +63,7 @@ async fn post_comment(
 
 #[get("/{blog_id}/{page_size}/{index}")]
 async fn comments(
-    path: web::Path<(i32, usize, usize)>,
+    path: web::Path<(i32, u64, u64)>,
     conn: web::Data<DatabaseConnection>,
 ) -> ServerResult<impl Responder> {
     let path = path.into_inner();
