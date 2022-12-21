@@ -64,7 +64,7 @@ client-shutdown = "default"
 shutdown-timeout = "default"
 
 [actix.tls] # TLS is disabled by default because the certs don't exist
-enabled = true
+enabled = false
 certificate = "./localhost.crt"
 private-key = "./localhost.key"
 

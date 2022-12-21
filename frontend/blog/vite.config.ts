@@ -96,17 +96,12 @@ export default ({ command, mode }: ConfigEnv) =>
             port: 3000,
             proxy: {
                 "^/api": {
-                    ssl: {
-                        key: fs.readFileSync(resolve(__dirname, "../../localhost.key"), "utf8"),
-                        cert: fs.readFileSync(resolve(__dirname, "../../localhost.crt"), "utf8"),
-                    },
                     changeOrigin: true,
                     target: {
-                        protocol: "https:",
+                        protocol: "http:",
                         host: "localhost",
                         port: 8080,
                     },
-                    secure: true,
                 },
             },
         },
