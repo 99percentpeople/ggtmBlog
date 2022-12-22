@@ -1,28 +1,17 @@
 <template>
     <n-space vertical align="stretch" item-style="display:flex;flex-direction:column;align-items:center">
-        <n-card
-            style="max-width: 1280px"
-            :segmented="{
-                content: true,
-            }"
-            header-style="padding:12px"
-        >
+        <n-card style="max-width: 1280px" :segmented="{
+            content: true,
+        }" header-style="padding:12px">
             <template #header>
                 <n-h3 style="display: flex; align-items: center; margin: 0">
-                    <n-icon> <ImageMultiple24Regular /> </n-icon>图片管理
+                    <n-icon>
+                        <ImageMultiple24Regular />
+                    </n-icon>图片管理
                 </n-h3>
             </template>
-            <n-data-table
-                remote
-                size="small"
-                ref="table"
-                :bordered="false"
-                :columns="columns"
-                :data="dataRef"
-                :loading="loadingRef"
-                :pagination="pagination"
-                :row-key="(row: RowData) => row.id"
-            />
+            <n-data-table remote size="small" ref="table" :bordered="false" :columns="columns" :data="dataRef"
+                :loading="loadingRef" :pagination="pagination" :row-key="(row: RowData) => row.id" />
             <n-modal v-model:show="showModal" preset="card" style="width: 600px" :title="imgTitle">
                 <img :src="previewImageUrl" style="width: 100%" />
             </n-modal>
@@ -138,8 +127,8 @@ async function onUploadFile({ file, data, headers, withCredentials, onFinish, on
         file.url = `${import.meta.env.VITE_API_URL}/file/${data.id}`;
         onFinish();
         await createFileList(pagination.pageSize, pagination.page);
-    } catch ({ message: msg }) {
-        message.error(msg as string);
+    } catch (error) {
+        message.error((error as AxiosError).message);
         onError();
     } finally {
         loadingRef.value = false;

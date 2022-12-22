@@ -1,15 +1,13 @@
 <template>
     <n-space vertical align="stretch" item-style="display:flex;flex-direction:column;align-items:center">
-        <n-card
-            style="max-width: 1440px"
-            :segmented="{
-                content: true,
-            }"
-            header-style="padding:12px"
-        >
+        <n-card style="max-width: 1440px" :segmented="{
+            content: true,
+        }" header-style="padding:12px">
             <template #header>
                 <n-h3 style="display: flex; align-items: center; margin: 0">
-                    <n-icon> <AddSquareMultiple20Regular /> </n-icon>发布
+                    <n-icon>
+                        <AddSquareMultiple20Regular />
+                    </n-icon>发布
                 </n-h3>
             </template>
             <n-form ref="formRef" :model="formValue" size="medium" label-placement="top" :rules="rules">
@@ -35,40 +33,23 @@
                         <n-input v-model:value="formValue.title" placeholder="标题" />
                     </n-form-item-gi>
                     <n-form-item-gi span="10" label="描述" path="summary" style="width: 100%">
-                        <n-input
-                            type="textarea"
-                            :autosize="{
-                                minRows: 3,
-                                maxRows: 5,
-                            }"
-                            v-model:value="formValue.summary"
-                            placeholder="描述"
-                        />
+                        <n-input type="textarea" :autosize="{
+                            minRows: 3,
+                            maxRows: 5,
+                        }" v-model:value="formValue.summary" placeholder="描述" />
                     </n-form-item-gi>
                     <n-form-item-gi span="10" path="content" style="width: 100%" label="正文">
                         <div style="display: flex; flex-direction: column; width: 100%">
-                            <md-editor
-                                @upload-img="onUploadEditorImg"
-                                @save="onSave"
-                                :toolbars-exclude="['github']"
-                                v-model="formValue.content"
-                                :style="{ height: `${mdEditorHeight}px` }"
-                            />
+                            <md-editor @upload-img="onUploadEditorImg" @save="onSave" :toolbars-exclude="['github']"
+                                v-model="formValue.content" :style="{ height: `${mdEditorHeight}px` }" />
                             <y-handle @height-change="handleHeightChange"></y-handle>
                         </div>
                     </n-form-item-gi>
                     <n-form-item-gi span="10" label="封面图片">
-                        <n-upload
-                            v-model:file-list="fileList"
-                            list-type="image-card"
-                            :max="1"
-                            :custom-request="onUploadFile"
-                            @preview="handlePreview"
-                            @change="handleUploadChange"
-                            @update:file-list="handleFileListChange"
-                            @before-upload="beforeUpload"
-                            @remove="handleRemoveFile"
-                        />
+                        <n-upload v-model:file-list="fileList" list-type="image-card" :max="1"
+                            :custom-request="onUploadFile" @preview="handlePreview" @change="handleUploadChange"
+                            @update:file-list="handleFileListChange" @before-upload="beforeUpload"
+                            @remove="handleRemoveFile" />
                         <n-modal v-model:show="showModal" preset="card" style="width: 600px">
                             <img :src="previewImageUrl" style="width: 100%" />
                         </n-modal>
@@ -93,7 +74,7 @@ import MdEditor from "md-editor-v3";
 import "md-editor-v3/lib/style.css";
 import { useLoginStatus } from "@/stores";
 import { getBlog, postOneBlog, putBlog, instance, uploadFile, deleteFile } from "@/apis";
-import { AxiosRequestConfig, AxiosResponse } from "axios";
+import { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 const route = useRoute();
 const formRef = ref<FormInst | null>(null);
 const mdEditorHeight = ref(500);
@@ -151,9 +132,9 @@ async function createBlogData(id: number) {
             });
         }
         message.success(msg);
-    } catch ({ message: msg, response }) {
-        message.error(msg as string);
-        if ((response as AxiosResponse).status === 404) {
+    } catch (error) {
+        message.error((error as AxiosError).message);
+        if (((error as AxiosError).response as AxiosResponse).status === 404) {
             router.push({ name: "publish" });
         }
     } finally {
@@ -304,17 +285,18 @@ async function onUploadFile({ file, data, headers, withCredentials, onFinish, on
     }
     formData.append(file.name, file.file as File);
     try {
-        const { data } = await uploadFile(formData, {
+        const { data, msg } = await uploadFile(formData, {
             withCredentials,
             headers,
             onUploadProgress: ({ loaded, total }) => {
                 onProgress({ percent: Math.ceil((loaded / total) * 100) });
             },
         } as AxiosRequestConfig);
-        file.url = `${import.meta.env.VITE_BASE_URL as string}/file/${data.id}`;
+        // console.log(data);
+        file.url = `${import.meta.env.VITE_API_URL}/file/${data[0].id}`;
         onFinish();
-    } catch ({ message: msg }) {
-        message.error(msg as string);
+    } catch (error) {
+        message.error((error as AxiosError).message);
         onError();
     }
 }
@@ -337,27 +319,24 @@ function handleRemoveFile(options: { file: UploadFileInfo; fileList: Array<Uploa
 }
 
 async function onUploadEditorImg(files: File[], callback: (urls: string[]) => void) {
-    const responses: any = await Promise.all(
-        Array.from(files).map((file) => {
-            return new Promise((rev, rej) => {
-                const form = new FormData();
-                form.append("file", file);
-                uploadFile(form, {
-                    withCredentials: true,
-                    headers: {
-                        "Content-Type": "multipart/form-data",
-                    },
-                })
-                    .then((res) => rev(res))
-                    .catch((error) => rej(error));
-            });
+    const form = new FormData();
+    files.forEach((file) => {
+        form.append("file", file);
+    });
+    try {
+        const { data } = await uploadFile(form, {
+            withCredentials: true,
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
         })
-    );
+        callback(
+            (data as any[]).map((file) => `${import.meta.env.VITE_API_URL}/file/${file.id}`)
+        );
+    }
+    catch (error) {
+        message.error((error as AxiosError).message);
+    }
 
-    callback(
-        responses.map(({ data }: any) => {
-            return `${import.meta.env.VITE_API_URL}/file/${data.id}`;
-        })
-    );
 }
 </script>

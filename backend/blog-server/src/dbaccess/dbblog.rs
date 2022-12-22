@@ -1,7 +1,11 @@
+use sea_orm::{
+    sea_query::{Expr, Func},
+};
+
 use super::*;
 
 use crate::{
-    error::ServerError,
+    error::Error,
     model::{BlogDetailItem, BlogListItem, BlogQuery, BlogSearch, UpdateBlog, UserBriefInfo},
 };
 
@@ -18,9 +22,12 @@ pub async fn blog_search(
             Condition::all()
                 .add_option(match &query.title_or_content {
                     Some(v) => Some(
-                        blog::Column::Title
-                            .like(&format!("%{v}%"))
-                            .or(blog::Column::Content.like(&format!("%{v}%"))),
+                        Expr::expr(Func::upper(Expr::col(blog::Column::Title)))
+                            .like(format!("%{v}%").to_uppercase())
+                            .or(Expr::expr(Func::upper(Expr::col(blog::Column::Content)))
+                                .like(format!("%{v}%").to_uppercase()))
+                            .or(Expr::expr(Func::upper(Expr::col(blog::Column::Summary)))
+                                .like(format!("%{v}%").to_uppercase())),
                     ),
                     None => None,
                 })
@@ -140,7 +147,7 @@ pub async fn get_item_list_with_query(
                     .one(&conn),
                 blog.find_related(tag::Entity).all(&conn)
             )?;
-            Ok::<_, ServerError>(BlogListItem {
+            Ok::<_, Error>(BlogListItem {
                 sort: sort.map_or(None, |sort| Some(sort.into())),
                 user: user.map_or(None, |user| Some(user.into())),
                 tags,
@@ -170,7 +177,7 @@ pub async fn insert_blog(
     let handles = tag_ids.into_iter().map(|tag_id| {
         let conn = conn.to_owned();
         rt::spawn(async move {
-            Ok::<_, ServerError>(
+            Ok::<_, Error>(
                 blogs_tags::ActiveModel::from(blogs_tags::Model::from((id, tag_id)))
                     .insert(&conn)
                     .await?,
@@ -205,13 +212,13 @@ pub async fn update_blog(
         let handles1 = coll.into_iter().map(|tag::Model { id: tag_id, .. }| {
             let conn = conn.to_owned();
             rt::spawn(async move {
-                Ok::<_, ServerError>(blogs_tags::Model::from((id, tag_id)).delete(&conn).await?)
+                Ok::<_, Error>(blogs_tags::Model::from((id, tag_id)).delete(&conn).await?)
             })
         });
         let handles2 = tag_ids.into_iter().map(|tag_id| {
             let conn = conn.to_owned();
             rt::spawn(async move {
-                Ok::<_, ServerError>(
+                Ok::<_, Error>(
                     blogs_tags::ActiveModel::from(blogs_tags::Model::from((id, tag_id)))
                         .insert(&conn)
                         .await?,

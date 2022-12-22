@@ -600,6 +600,7 @@ dependencies = [
  "lazy_static",
  "log",
  "migration",
+ "mime",
  "regex",
  "rust-crypto",
  "sea-orm",

@@ -2,6 +2,7 @@ use std::convert::Infallible;
 use std::fmt::Debug;
 use std::num::ParseIntError;
 
+use actix_multipart::MultipartError;
 use actix_web::body::BoxBody;
 use actix_web::error::Error as ActixError;
 use actix_web::http::StatusCode;
@@ -12,33 +13,22 @@ use derive_more::{Display, Error};
 use sea_orm::DbErr;
 
 #[derive(Debug, Display, Error, Clone)]
-pub enum ServerError {
+pub enum Error {
     #[display(fmt = "database error: {}", field)]
     DataBaseError { field: String },
+    #[display(fmt = "server error: {}", field)]
+    ServerError { field: String, code: StatusCode },
     #[display(fmt = "client error: {}", field)]
-    ActixError { field: String, code: StatusCode },
-    #[display(fmt = "not found error: {}", field)]
-    NotFoundError { field: String },
-    #[display(fmt = "infallible error: {}", field)]
-    InfallibleError { field: String },
-    #[display(fmt = "internal error: {}", field)]
-    InternalError { field: String },
-    #[display(fmt = "parse error: {}", field)]
-    ParseError { field: String },
+    ClientError { field: String },
 }
-pub type ServerResult<T, E = ServerError> = std::result::Result<T, E>;
+pub type ServerResult<T, E = Error> = std::result::Result<T, E>;
 
-impl ResponseError for ServerError {
+impl ResponseError for Error {
     fn status_code(&self) -> StatusCode {
         match self {
-            ServerError::ActixError { code, .. } => code.clone(),
-            ServerError::DataBaseError { .. } | ServerError::InfallibleError { .. } => {
-                StatusCode::INTERNAL_SERVER_ERROR
-            }
-            ServerError::NotFoundError { .. } | ServerError::InternalError { .. } => {
-                StatusCode::NOT_FOUND
-            }
-            ServerError::ParseError { .. } => StatusCode::BAD_REQUEST,
+            Error::ServerError { code, .. } => code.to_owned(),
+            Error::DataBaseError { .. } => StatusCode::INTERNAL_SERVER_ERROR,
+            Error::ClientError { .. } => StatusCode::BAD_REQUEST,
         }
     }
     fn error_response(&self) -> HttpResponse<BoxBody> {
@@ -46,56 +36,66 @@ impl ResponseError for ServerError {
     }
 }
 
-impl From<ActixError> for ServerError {
+impl From<ActixError> for Error {
     fn from(err: ActixError) -> Self {
-        ServerError::ActixError {
+        Error::ServerError {
             field: err.to_string(),
             code: err.error_response().status(),
         }
     }
 }
 
-impl From<DbErr> for ServerError {
+impl From<DbErr> for Error {
     fn from(err: DbErr) -> Self {
-        ServerError::DataBaseError {
+        Error::DataBaseError {
             field: err.to_string(),
         }
     }
 }
 
-impl From<Infallible> for ServerError {
+impl From<Infallible> for Error {
     fn from(err: Infallible) -> Self {
-        ServerError::InfallibleError {
+        Error::ClientError {
             field: err.to_string(),
         }
     }
 }
 
-impl From<std::io::Error> for ServerError {
+impl From<std::io::Error> for Error {
     fn from(err: std::io::Error) -> Self {
         use std::io::ErrorKind;
         match err.kind() {
-            ErrorKind::NotFound => ServerError::NotFoundError {
+            ErrorKind::NotFound => Error::ClientError {
                 field: err.to_string(),
             },
-            _ => ServerError::InternalError {
+            _ => Error::ServerError {
                 field: err.to_string(),
+                code: StatusCode::INTERNAL_SERVER_ERROR,
             },
         }
     }
 }
 
-impl From<ParseIntError> for ServerError {
+impl From<ParseIntError> for Error {
     fn from(err: ParseIntError) -> Self {
-        ServerError::ParseError {
+        Error::ClientError {
             field: err.to_string(),
         }
     }
 }
 
-impl From<JoinError> for ServerError {
+impl From<JoinError> for Error {
     fn from(err: JoinError) -> Self {
-        ServerError::InternalError {
+        Error::ServerError {
+            field: err.to_string(),
+            code: StatusCode::INTERNAL_SERVER_ERROR,
+        }
+    }
+}
+
+impl From<MultipartError> for Error {
+    fn from(err: MultipartError) -> Self {
+        Error::ClientError {
             field: err.to_string(),
         }
     }
