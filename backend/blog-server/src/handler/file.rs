@@ -3,7 +3,6 @@ use crate::{error::ServerResult, Settings};
 use actix_files::NamedFile;
 use actix_identity::Identity;
 use actix_multipart::{Field, Multipart};
-use actix_web::rt;
 use entity::{file, user};
 use futures::{try_join, TryStreamExt};
 use sea_orm::{
@@ -14,8 +13,9 @@ use std::{
     io::ErrorKind,
     ops::Not,
     path::{self, Path, PathBuf},
+    sync::Arc,
 };
-use tokio::{fs, io::AsyncWriteExt};
+use tokio::{fs, io::AsyncWriteExt, sync::Mutex};
 use uuid::Uuid;
 
 pub fn files_handler(cfg: &mut web::ServiceConfig) {
@@ -77,12 +77,12 @@ async fn upload_file(
     let base_path = settings.application.file_url.to_owned();
     let user_dir = format!("{}-{}", user_info.id, user_info.username);
 
-    let mut stream = payload.map_ok(|mut field| {
+    let stream = payload.map_err(ErrorBadRequest).map_ok(|mut field| {
         let base_path = base_path.to_owned();
         let user_dir = user_dir.to_owned();
         let conn = conn.to_owned();
         let path = [&base_path, &user_dir].iter().collect::<path::PathBuf>();
-        rt::spawn(async move {
+        async move {
             path.exists()
                 .not()
                 .then(|| std::fs::create_dir_all(&path))
@@ -98,7 +98,7 @@ async fn upload_file(
                 .into_owned();
 
             let file_type = field.content_type().to_string();
-            
+
             let model = file::ActiveModel {
                 id: NotSet,
                 path: Set(path),
@@ -110,16 +110,29 @@ async fn upload_file(
             .await?;
 
             <ServerResult<_>>::Ok(model)
-        })
+        }
     });
 
-    let mut models = Vec::new();
-    // iterate over multipart stream and process each field in turn
-    while let Some(handle) = stream.try_next().await? {
-        models.push(handle.await??);
-    }
+    let models = Arc::new(Mutex::new(Vec::new()));
+    let nums = std::thread::available_parallelism()
+        .unwrap_or(std::num::NonZeroUsize::new(1).unwrap())
+        .get();
+    log::debug!("thread nums = {nums}");
+    
+    stream
+        .try_for_each_concurrent(nums, |handle| {
+            let models = Arc::clone(&models);
+            async move {
+                let model = handle.await?;
+                models.lock().await.push(model);
+                Ok(())
+            }
+        })
+        .await?;
 
-    Ok(web::Json(json!({"msg":"上传成功","data": models})))
+    Ok(web::Json(
+        json!({"msg":"上传成功","data": *models.lock().await}),
+    ))
 }
 
 #[get("/{file_id}")]
@@ -233,7 +246,7 @@ async fn put_file(
         .ok_or(ErrorNotFound("未找到该文件"))?;
     let base_path = settings.application.file_url.to_owned();
     let path: path::PathBuf = [&base_path, &file.path].iter().collect();
-    while let Ok(Some(mut field)) = payload.try_next().await {
+    while let Some(mut field) = payload.try_next().await? {
         if field.content_type().type_() == mime::IMAGE {
             update_file(&mut field, &path).await?;
         };
